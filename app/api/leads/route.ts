@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {createClient} from "@/lib/supabase/server";
+export async function POST(req:Request){try{const body=await req.json();const supabase=await createClient();const {error}=await supabase.from("leads").insert({name:body.name,phone:body.phone,email:body.email,property:body.property||null,message:body.message||null});if(error)return NextResponse.json({error:error.message},{status:400});return NextResponse.json({ok:true})}catch{return NextResponse.json({error:"Invalid request"},{status:400})}}
