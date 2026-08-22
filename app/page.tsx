@@ -12,7 +12,16 @@ const services=[
 
 export default function Home(){
  const [status,setStatus]=useState("");
- async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setStatus("Sending...");const data=Object.fromEntries(new FormData(e.currentTarget));const r=await fetch("/api/leads",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});setStatus(r.ok?"Thank you. We will contact you shortly.":"Something went wrong. Please try again.");if(r.ok)e.currentTarget.reset()}
+ async function submit(e:FormEvent<HTMLFormElement>){
+  e.preventDefault(); setStatus("Sending...");
+  try{
+   const form=e.currentTarget; const data=Object.fromEntries(new FormData(form));
+   const r=await fetch("/api/leads",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+   const result=await r.json().catch(()=>({}));
+   if(r.ok){setStatus("Thank you. We will contact you shortly.");form.reset();}
+   else setStatus(`Error: ${result.error||`Request failed (${r.status})`}`);
+  }catch(err){setStatus("Error: Could not connect to the enquiry service. Please try again.");}
+ }
  return <>
   <header><div className="container nav"><div className="brand">StayGrowth Consulting</div><nav className="navlinks"><a href="#services">Services</a><a href="#packages">Packages</a><a href="#why">Why Us</a><a href="#contact">Contact</a></nav><a className="btn" href="#contact">Book a Consultation</a></div></header>
   <main>
